@@ -13,9 +13,8 @@ import time
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--all', action='store_true', help='Search all history')
-parser.add_argument('--year', type=str, default=None)
-parser.add_argument('--month', type=str, default=None)
-parser.add_argument('--day', type=str, default=None)
+parser.add_argument('--year', type=str, default=None, help='Restrict search to this year (eg. 2015)')
+parser.add_argument('--month', type=str, default=None, help='Restrict search to this month (eg. 02)')
 parser.add_argument('-s', '--search', help='search string', type=str, required=True)
 args = parser.parse_args()
 
@@ -24,7 +23,7 @@ curr_year = time.strftime('%Y')
 curr_month = time.strftime('%m')
 curr_day = time.strftime('%d')
 
-# Check if year, month or date was set. Otherwise use current date
+# Check if year or month was set. Otherwise use current date
 if args.year is None:
     search_year = curr_year
 else:
@@ -35,18 +34,11 @@ if args.month is None:
 else:
     search_month = args.month
 
-if args.day is None:
-    search_day = curr_day
-else:
-    search_day = args.day
-
 
 # The command history is saved in subdirs of this folder
 root_path = '/Users/kasper/.history'
 if args.all:
     search_path = root_path
-elif args.day is not None:
-    search_path = '{root_path}/{search_year}/{search_month}/{search_day}'.format(**locals())
 elif args.month is not None:
     search_path = '{root_path}/{search_year}/{search_month}'.format(**locals())
 elif args.year is not None:
@@ -58,10 +50,10 @@ else:
 search_string = args.search
 # recursively search for "search string" in "search_path" using grep.
 try:
-    #search_hist = sp.check_output("grep -r {search_string} {search_path}".format(**locals()),
-    #                              shell=True)
     search_hist = sp.check_output(['grep', '-r', search_string, search_path])
 # check_output throws an error if the command returns nothing.
 except sp.CalledProcessError:
     search_hist = 'no results'
+
+# Show the actual output of the command
 print(search_hist)

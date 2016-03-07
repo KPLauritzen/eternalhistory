@@ -17,4 +17,4 @@ HISTFILE="${HISTDIR}/$(date -u +%Y/%m/%d-%H:%M)_${HOSTNAME_SHORT}_$$"
 This creates a `.history` folder in your `$HOME` dir and makes `<YEAR>/<MONTH>` subfolders.
 Each terminal you start will create a file with the current date, time, hostname and PID.
 
-Place `eternalhistory.py` somewhere in your `$PATH`. Search through your old commands by year, month and day.
+Place `eternalhistory.py` somewhere in your `$PATH`. Search through your old commands by year and month.
