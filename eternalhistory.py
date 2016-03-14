@@ -10,6 +10,7 @@ import argparse
 import logging as log
 import subprocess as sp
 import time
+import os
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--all', action='store_true', help='Search all history')
@@ -36,7 +37,7 @@ else:
 
 
 # The command history is saved in subdirs of this folder
-root_path = '/Users/kasper/.history'
+root_path = os.path.expanduser('~/.history')
 if args.all:
     search_path = root_path
 elif args.month is not None:
