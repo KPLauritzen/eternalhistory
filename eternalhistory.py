@@ -5,18 +5,22 @@
 
 # Shamelessly stolen from https://twitter.com/michaelhoffman/status/639178145673932800
 
-from __future__ import (print_function, division, absolute_import)
+from __future__ import print_function
 import argparse
-import logging as log
-import subprocess as sp
 import time
 import os
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--all', action='store_true', help='Search all history')
-parser.add_argument('--year', type=str, default=None, help='Restrict search to this year (eg. 2015)')
-parser.add_argument('--month', type=str, default=None, help='Restrict search to this month (eg. 02)')
-parser.add_argument('-s', '--search', help='search string', type=str, required=True)
+parser.add_argument('--year', type=str, default=None, help='Restrict search to a given year (eg. 2015)')
+parser.add_argument('--month', type=str, default=None, help='Restrict search to a given month (eg. 02)')
+parser.add_argument('search', help='search string', type=str, nargs="*")
+
+search_type = parser.add_mutually_exclusive_group()
+search_type.add_argument('--and', action='store_true', dest='and_search', help='Search for intersect of all argument')
+search_type.add_argument('--or', action='store_false', dest='and_search', help='Search for union of all argument')
+
+parser.set_defaults(and_search=False)
 args = parser.parse_args()
 
 # Get strings for current date
@@ -48,13 +52,14 @@ else:
     search_path = '{root_path}/{curr_year}/{curr_month}'.format(**locals())
 
 
-search_string = args.search
+first_term = args.search[0]
 # recursively search for "search string" in "search_path" using grep.
-try:
-    search_hist = sp.check_output(['grep', '-r', search_string, search_path])
-# check_output throws an error if the command returns nothing.
-except sp.CalledProcessError:
-    search_hist = 'no results'
 
-# Show the actual output of the command
-print(search_hist)
+command = 'grep -r {} {}'.format(first_term, search_path)
+if len(args.search) > 1 and args.and_search:
+    # Loop through each additional search term
+    # add a pipe grepping for that term
+    for term in args.search[1:]:
+        command += '| grep {}'.format(term)
+
+os.system(command)
